@@ -175,6 +175,31 @@ struct ListaMedicos {
     }
 };
 
+// ================================================================
+// R4 - RELATORIO E HISTORICO COMPLETO
+// ================================================================
+
+// TODO 10: Implemente a funcao imprimirHistorico(PilhaHistorico&)
+void imprimirHistorico(PilhaHistorico& hist) {
+    cout << "\n=== Relatorio de Atendimentos ===\n";
+    if (hist.isEmpty()) {
+        cout << "(nenhum atendimento registrado)\n";
+        return;
+    }
+    
+    PilhaHistorico aux;
+    
+    while (!hist.isEmpty()) {
+        string atendimento = hist.pop();
+        cout << "  - " << atendimento << "\n";
+        aux.push(atendimento);
+    }
+    
+    while (!aux.isEmpty()) {
+        hist.push(aux.pop());
+    }
+}
+
 bool perguntoSimNao(const string& mensagem) {
     string resposta;
     while (true) {
@@ -196,9 +221,7 @@ int main() {
     PilhaHistorico historico;
     ListaMedicos   medicos;
 
-  
     cout << "  Sistema de Triagem e Atendimento Hospitalar      \n";
-    
 
     cout << "=== CADASTRO DE MEDICOS ===\n";
     bool maisMedicos = true;
@@ -239,6 +262,24 @@ int main() {
 
     cout << "\nPacientes aguardando na fila (" << fila.tamanho() << " no total):\n";
     fila.imprimirFila();
+
+ 
+    cout << "\n=== CONSULTAS EM ANDAMENTO ===\n";
+    int atendimentoNum = 1;
+
+    while (!fila.isEmpty() && medicos.temMedico()) {
+        string paciente = fila.dequeue();
+        string medico   = medicos.chamarMedico();
+
+        cout << "  [" << atendimentoNum++ << "] " << paciente 
+             << " vai consultar com " << medico << "\n";
+
+        historico.push(medico + " -> " + paciente);
+        medicos.adicionarMedico(medico);
+    }
+
+
+    imprimirHistorico(historico);
 
     return 0;
 }
