@@ -116,6 +116,65 @@ struct PilhaHistorico {
     }
 };
 
+// ================================================================
+// R3 - LISTA DE MEDICOS DISPONIVEIS (lista encadeada)
+// ================================================================
+struct ListaMedicos {
+    No* head = nullptr;
+
+    // TODO 7: Implemente adicionarMedico(nome)
+    void adicionarMedico(const string& nome) {
+        No* novo = new No(nome);
+        if (head == nullptr) {
+            head = novo;
+        } else {
+            No* temp = head;
+            while (temp->prox != nullptr) {
+                temp = temp->prox;
+            }
+            temp->prox = novo;
+        }
+    }
+
+    // TODO 8: Implemente chamarMedico()
+    string chamarMedico() {
+        if (head == nullptr) return "";
+        No* temp = head;
+        string nome = temp->nome;
+        head = head->prox;
+        delete temp;
+        return nome;
+    }
+
+    // TODO 9: Implemente percorrer()
+    void percorrer(const string& prefixo = "") const {
+        if (!prefixo.empty()) cout << prefixo << ": ";
+        
+        if (head == nullptr) {
+            cout << "(lista vazia)\n";
+            return;
+        }
+        
+        No* temp = head;
+        while (temp != nullptr) {
+            cout << temp->nome;
+            if (temp->prox != nullptr) cout << ", ";
+            temp = temp->prox;
+        }
+        cout << "\n";
+    }
+
+    bool temMedico() const { return head != nullptr; }
+
+    ~ListaMedicos() {
+        while (head) {
+            No* t = head;
+            head  = head->prox;
+            delete t;
+        }
+    }
+};
+
 bool perguntoSimNao(const string& mensagem) {
     string resposta;
     while (true) {
@@ -135,13 +194,31 @@ bool perguntoSimNao(const string& mensagem) {
 int main() {
     FilaPacientes  fila;
     PilhaHistorico historico;
+    ListaMedicos   medicos;
 
-    
-    cout << "  Sistema de Triagem e Atendimento Hospitalar      \n";
   
+    cout << "  Sistema de Triagem e Atendimento Hospitalar      \n";
+    
 
-    // R1: CADASTRO DE PACIENTES 
-    cout << "=== CADASTRO DE PACIENTES ===\n";
+    cout << "=== CADASTRO DE MEDICOS ===\n";
+    bool maisMedicos = true;
+    do {
+        string nome;
+        cout << "Nome do medico: ";
+        cin >> ws;
+        getline(cin, nome);
+
+        medicos.adicionarMedico(nome);
+
+        maisMedicos = perguntoSimNao("Tem mais medicos? (s/n): ");
+        cout << "---------------------------------------------------\n";
+    } while (maisMedicos);
+
+    cout << "\nMedicos cadastrados no plantao:\n";
+    medicos.percorrer("Medicos");
+
+    // -- R1: CADASTRO DE PACIENTES ----------------------------
+    cout << "\n=== CADASTRO DE PACIENTES ===\n";
     bool maisPacientes = true;
     do {
         string nome;
@@ -163,12 +240,6 @@ int main() {
     cout << "\nPacientes aguardando na fila (" << fila.tamanho() << " no total):\n";
     fila.imprimirFila();
 
-    // SIMULACAO R2: TESTE DE EMPILHAMENTO
-    if (!fila.isEmpty()) {
-        string pac = fila.dequeue();
-        historico.push("Atendimento de Teste -> " + pac);
-        cout << "\nUltimo registro no historico (peek): " << historico.peek() << "\n";
-    }
-
     return 0;
 }
+
