@@ -80,6 +80,42 @@ struct FilaPacientes {
     }
 };
 
+// ================================================================
+// R2 - HISTORICO COM PILHA (estrutura LIFO)
+// ================================================================
+struct PilhaHistorico {
+    No* topo = nullptr;
+
+    // TODO 4: Implemente push(nome)
+    void push(const string& nome) {
+        No* novo = new No(nome);
+        novo->prox = topo;
+        topo = novo;
+    }
+
+    // TODO 5: Implemente pop()
+    string pop() {
+        if (isEmpty()) return "";
+        No* temp = topo;
+        string nome = temp->nome;
+        topo = topo->prox;
+        delete temp;
+        return nome;
+    }
+
+    // TODO 6: Implemente peek()
+    string peek() const {
+        if (isEmpty()) return "";
+        return topo->nome;
+    }
+
+    bool isEmpty() const { return topo == nullptr; }
+
+    ~PilhaHistorico() {
+        while (!isEmpty()) pop();
+    }
+};
+
 bool perguntoSimNao(const string& mensagem) {
     string resposta;
     while (true) {
@@ -97,11 +133,14 @@ bool perguntoSimNao(const string& mensagem) {
 }
 
 int main() {
-    FilaPacientes fila;
+    FilaPacientes  fila;
+    PilhaHistorico historico;
 
+    
     cout << "  Sistema de Triagem e Atendimento Hospitalar      \n";
+  
 
-    // -- R1: CADASTRO DE PACIENTES ----------------------------
+    // R1: CADASTRO DE PACIENTES 
     cout << "=== CADASTRO DE PACIENTES ===\n";
     bool maisPacientes = true;
     do {
@@ -123,6 +162,13 @@ int main() {
 
     cout << "\nPacientes aguardando na fila (" << fila.tamanho() << " no total):\n";
     fila.imprimirFila();
+
+    // SIMULACAO R2: TESTE DE EMPILHAMENTO
+    if (!fila.isEmpty()) {
+        string pac = fila.dequeue();
+        historico.push("Atendimento de Teste -> " + pac);
+        cout << "\nUltimo registro no historico (peek): " << historico.peek() << "\n";
+    }
 
     return 0;
 }
